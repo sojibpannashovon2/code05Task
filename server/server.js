@@ -46,10 +46,11 @@ client.connect().then(() => {
   console.log("Connected to MongoDB");
 });
 
-// Start server
+//? Start server
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// File upload configuration
+//? File upload configuration
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -65,9 +66,8 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
-// JWT Securty Authentication
+//?Verify Jwt or Validation of JWT token
 
-//Verify Jwt or Validation of JWT token
 const verifyJWT = (req, res, next) => {
   const authoraization = req.headers.authorization;
   if (!authoraization) {
@@ -76,7 +76,7 @@ const verifyJWT = (req, res, next) => {
       .send({ error: true, message: `Unauthorized Access` });
   }
   const token = authoraization.split(" ")[1];
-  // console.log(token);
+
   //verify token
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
@@ -125,4 +125,54 @@ app.post("/api/links", verifyJWT, upload.single("file"), async (req, res) => {
 
   await db.collection("links").insertOne(newLink);
   res.json({ link: `${process.env.CLIENT_URL}/content/${newLink.linkId}` });
+});
+
+//? Access content via link (protected route)
+
+app.get("/api/links/:id", async (req, res) => {
+  const links = db.collection("links");
+  const link = await links.findOne({ linkId: req.params.id });
+
+  if (!link) return res.status(404).json({ error: "Link not found" });
+
+  if (link.expiresAt && new Date() > link.expiresAt) {
+    return res.status(410).json({ error: "Link expired" });
+  }
+
+  if (!link.isPublic) {
+    const password = req.headers["x-password"];
+    if (!password || !bcrypt.compareSync(password, link.passwordHash)) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+  }
+
+  await links.updateOne({ linkId: link.linkId }, { $inc: { accessCount: 1 } });
+  res.json({
+    content: link.content,
+    file: link.file ? `/uploads/${link.file}` : null,
+    isPublic: link.isPublic,
+  });
+});
+
+//? Delete a link (protected route)
+
+app.delete("/api/links/:id", verifyJWT, async (req, res) => {
+  const links = db.collection("links");
+  const link = await links.findOne({ linkId: req.params.id });
+
+  if (!link) return res.status(404).json({ error: "Link not found" });
+
+  if (link.owner !== req.user.uid) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  await links.deleteOne({ linkId: req.params.id });
+  res.json({ message: "Link deleted" });
+});
+
+//? Error handling middleware
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Server error" });
 });
