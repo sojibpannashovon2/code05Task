@@ -47,3 +47,51 @@ client.connect().then(() => {
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// File upload configuration
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+
+  filename: (req, file, cb) => {
+    cb(null, `&{Date.now()}-${file.originalname}`);
+  },
+});
+
+const upolad = multer({ storage });
+
+// JWT Securty Authentication
+
+//Verify Jwt or Validation of JWT token
+const verifyJWT = (req, res, next) => {
+  const authoraization = req.headers.authorization;
+  if (!authoraization) {
+    return res
+      .status(401)
+      .send({ error: true, message: `Unauthorized Access` });
+  }
+  const token = authoraization.split(" ")[1];
+  // console.log(token);
+  //verify token
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res
+        .status(401)
+        .send({ error: true, message: `Unauthorized Access` });
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
+//Genarate Jwt token
+app.post("/jwt", async (req, res) => {
+  const email = req.body;
+  const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: `7d`,
+  });
+  // console.log(token)
+  res.send({ token });
+});
