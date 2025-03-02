@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router";
+import { AuthContext } from "../../Provider/AuthProvider";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { user, logOut } = useContext(AuthContext);
   return (
     <>
       <nav className="relative px-4 py-4 flex justify-between items-center bg-white">
@@ -55,11 +56,29 @@ const Navbar = () => {
             </Link>
           </li>
         </ul>
-        <div className="hidden lg:flex space-x-3">
-          <Link to="/login">
-            <button className="btn btn-dash">Login</button>
-          </Link>
-        </div>
+
+        {user ? (
+          <>
+            <div className="flex gap-4">
+              <Link to="/dashboard" className="btn btn-dash btn-success">
+                Dashboard
+              </Link>
+              <div className="hidden lg:flex space-x-3">
+                <button onClick={logOut} className="btn btn-dash">
+                  Logout
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="hidden lg:flex space-x-3">
+              <Link to="/login">
+                <button className="btn btn-dash">Login</button>
+              </Link>
+            </div>
+          </>
+        )}
       </nav>
 
       {/* Mobile Menu */}

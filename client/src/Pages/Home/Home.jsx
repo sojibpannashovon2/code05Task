@@ -1,10 +1,11 @@
 import React from "react";
 import LinkForm from "../../Components/LinkForm";
+import CreateLinkForm from "../../Components/Links/CreatLinkForm";
 
 const Home = () => {
   return (
     <>
-      <div className="w-[40%] mx-auto  my-28">
+      {/* <div className="w-[40%] mx-auto  my-28">
         <h1 className="my-4 ">Insert your File(Image/pdf/Document)</h1>
         <div className="flex flex-col ">
           <label className="input">
@@ -108,6 +109,10 @@ const Home = () => {
             </fieldset>
           </label>
         </div>
+      </div> */}
+
+      <div>
+        <CreateLinkForm />
       </div>
     </>
   );
