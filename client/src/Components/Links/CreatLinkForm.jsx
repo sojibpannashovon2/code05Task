@@ -25,7 +25,7 @@ const CreateLinkForm = ({ setLinks }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:7001/api/links",
+        "http://localhost:7000/api/links",
         formDataToSend,
         {
           headers: {
@@ -48,12 +48,13 @@ const CreateLinkForm = ({ setLinks }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-2">Upload File:</label>
+
           <input
             type="file"
             onChange={(e) =>
               setFormData({ ...formData, file: e.target.files[0] })
             }
-            className="block w-full"
+            className="block w-full file-input file-input-error"
           />
         </div>
 

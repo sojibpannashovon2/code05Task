@@ -156,6 +156,25 @@ app.get("/api/links/:id", async (req, res) => {
   });
 });
 
+// Get all links for authenticated user
+app.get("/api/links", verifyJWT, async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: "Unauthorized" });
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const links = db.collection("links");
+    const userLinks = await links.find({ userId: decoded.userId }).toArray();
+
+    res.json(userLinks);
+  } catch (error) {
+    console.error("Error fetching user links:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 //? Delete a link (protected route)
 
 app.delete("/api/links/:id", verifyJWT, async (req, res) => {

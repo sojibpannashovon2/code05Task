@@ -28,31 +28,7 @@ const Navbar = () => {
           </li>
           <li>
             <Link className="text-sm text-blue-600 font-bold" to="/about">
-              About Us
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="text-sm text-gray-400 hover:text-gray-500"
-              to="/services"
-            >
-              Services
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="text-sm text-gray-400 hover:text-gray-500"
-              to="/pricing"
-            >
-              Pricing
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="text-sm text-gray-400 hover:text-gray-500"
-              to="/contact"
-            >
-              Contact
+              Tracking Page
             </Link>
           </li>
         </ul>
