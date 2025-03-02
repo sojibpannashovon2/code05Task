@@ -77,7 +77,8 @@ const verifyJWT = (req, res, next) => {
   }
   const token = authoraization.split(" ")[1];
 
-  //verify token
+  //?verify token
+
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res
@@ -89,7 +90,8 @@ const verifyJWT = (req, res, next) => {
   });
 };
 
-//Genarate Jwt token
+//?Genarate Jwt token
+
 app.post("/jwt", async (req, res) => {
   const email = req.body;
   const token = jwt.sign(email, process.env.JWT_SECRET, {
@@ -99,7 +101,7 @@ app.post("/jwt", async (req, res) => {
   res.send({ token });
 });
 
-// Create a shareable link from user
+//? Create a shareable link from user
 
 app.post("/api/links", verifyJWT, upload.single("file"), async (req, res) => {
   const { content, isPublic, password, expiresAt } = req.body;
